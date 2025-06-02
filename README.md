@@ -1,4 +1,4 @@
-# object-oriented-programming
+# ব্যাংক সম্পর্কিত OOP উদাহরণ
 // Abstraction: একটি abstract class বানানো হয়েছে, যেটা সব BankAccount-এর ভিত্তি নির্ধারণ করে
 abstract class BankAccount {
     // Encapsulation: accountNumber এবং balance ফিল্ডগুলো private
