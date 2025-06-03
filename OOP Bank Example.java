@@ -1,21 +1,25 @@
-// Abstraction: একটি abstract class বানানো হয়েছে, যেটা সব BankAccount-এর ভিত্তি নির্ধারণ করে
+// Abstraction: BankAccount নামে একটি abstract ক্লাস বানানো হলো
 abstract class BankAccount {
-    // Encapsulation: accountNumber এবং balance ফিল্ডগুলো private
+    // Encapsulation: accountNumber ও balance ফিল্ডগুলো private করে রাখা হলো
     private String accountNumber;
     private double balance;
 
-    // Constructor: নতুন একাউন্ট তৈরি হলে প্রাথমিক তথ্য সেট করা হয়
+    // Default Constructor: একাউন্ট না জানলে ডিফল্ট মান সেট করা হবে
+    public BankAccount() {
+        this("N/A", 0.0); // constructor chaining
+    }
+
+    // Parameterized Constructor: নির্দিষ্ট তথ্য দিয়ে একাউন্ট তৈরি
     public BankAccount(String accountNumber, double balance) {
         setAccountNumber(accountNumber);
         deposit(balance); // শুরুতে কিছু টাকা জমা রাখা যায়
     }
 
-    // Getter
+    // Getter & Setter
     public String getAccountNumber() {
         return accountNumber;
     }
 
-    // Setter
     public void setAccountNumber(String accountNumber) {
         if (!accountNumber.isEmpty()) {
             this.accountNumber = accountNumber;
@@ -26,14 +30,14 @@ abstract class BankAccount {
         return balance;
     }
 
-    // Deposit Method (Encapsulated)
+    // Deposit Method: টাকার পরিমাণ বাড়ানো হয়
     public void deposit(double amount) {
         if (amount > 0) {
             balance += amount;
         }
     }
 
-    // Withdraw Method (Encapsulated)
+    // Withdraw Method: টাকা তোলা যায়, কিন্তু ব্যালেন্স চেক করা হয়
     public void withdraw(double amount) {
         if (amount > 0 && amount <= balance) {
             balance -= amount;
@@ -42,15 +46,21 @@ abstract class BankAccount {
         }
     }
 
-    // Abstract Methods
+    // Abstract Methods: child class গুলো এই method গুলো override করবে
     public abstract void accountType();
     public abstract void showDetails();
 }
 
-// Inheritance: SavingsAccount ক্লাসটি BankAccount থেকে তৈরি হয়েছে
+// Inheritance: SavingsAccount -> BankAccount
 class SavingsAccount extends BankAccount {
     private double interestRate;
 
+    // Default Constructor
+    public SavingsAccount() {
+        this("SA000", 0.0, 0.0);
+    }
+
+    // Constructor: সেভিংস একাউন্টে ইন্টারেস্ট থাকে
     public SavingsAccount(String accNumber, double balance, double interestRate) {
         super(accNumber, balance);
         this.interestRate = interestRate;
@@ -58,7 +68,7 @@ class SavingsAccount extends BankAccount {
 
     @Override
     public void accountType() {
-        System.out.println("🏦 এটি একটি সেভিংস একাউন্ট");
+        System.out.println("🏦 এটি একটি সেভিংস একাউন্ট (Savings Account)");
     }
 
     @Override
@@ -68,6 +78,7 @@ class SavingsAccount extends BankAccount {
         System.out.println("📈 ইন্টারেস্ট রেট: " + interestRate + "%");
     }
 
+    // ইন্টারেস্ট হিসাব করে ব্যালেন্সে যোগ করা হয়
     public void addInterest() {
         double interest = getBalance() * interestRate / 100;
         deposit(interest);
@@ -75,10 +86,16 @@ class SavingsAccount extends BankAccount {
     }
 }
 
-// Inheritance: CurrentAccount ক্লাসও BankAccount থেকে তৈরি হয়েছে
+// Inheritance: CurrentAccount -> BankAccount
 class CurrentAccount extends BankAccount {
     private double overdraftLimit;
 
+    // Default Constructor
+    public CurrentAccount() {
+        this("CA000", 0.0, 0.0);
+    }
+
+    // Constructor: কারেন্ট একাউন্টে ওভারড্রাফট সুবিধা থাকে
     public CurrentAccount(String accNumber, double balance, double overdraftLimit) {
         super(accNumber, balance);
         this.overdraftLimit = overdraftLimit;
@@ -86,7 +103,7 @@ class CurrentAccount extends BankAccount {
 
     @Override
     public void accountType() {
-        System.out.println("🏦 এটি একটি কারেন্ট একাউন্ট");
+        System.out.println("🏦 এটি একটি কারেন্ট একাউন্ট (Current Account)");
     }
 
     @Override
@@ -96,7 +113,7 @@ class CurrentAccount extends BankAccount {
         System.out.println("📉 ওভারড্রাফট সীমা: " + overdraftLimit + " টাকা");
     }
 
-    // Method Override করে withdraw-এর নতুন নিয়ম যুক্ত করা হলো
+    // ওভারড্রাফট লিমিট সহ টাকা তোলা যায়
     @Override
     public void withdraw(double amount) {
         if (amount <= getBalance() + overdraftLimit) {
@@ -107,15 +124,21 @@ class CurrentAccount extends BankAccount {
     }
 }
 
-// Interface: একটি রেগুলেটরি ইন্টারফেস যা Maintainable ক্লাসগুলো অনুসরণ করবে
+// Interface: ব্যাংকের অডিটের কাজ যারা করে তারা Maintainable ইন্টারফেস অনুসরণ করে
 interface Maintainable {
     void auditReport();
 }
 
-// BankEmployee: ইন্টারফেস ইমপ্লিমেন্ট করা হলো
+// BankEmployee: ব্যাংক কর্মী অডিট রিপোর্ট তৈরি করে
 class BankEmployee implements Maintainable {
     private String name;
 
+    // Default Constructor
+    public BankEmployee() {
+        this("অজানা");
+    }
+
+    // Constructor: নামসহ কর্মী তৈরি
     public BankEmployee(String name) {
         this.name = name;
     }
@@ -126,26 +149,38 @@ class BankEmployee implements Maintainable {
     }
 }
 
-// Main ক্লাস: প্রোগ্রাম চালানোর entry point
+// Main class: প্রোগ্রাম চালানোর জন্য entry point
 public class Main {
     public static void main(String[] args) {
-        BankAccount savings = new SavingsAccount("SA123", 5000, 5);
-        BankAccount current = new CurrentAccount("CA456", 3000, 1000);
-
+        // 🔹 সেভিংস একাউন্ট তৈরি
+        SavingsAccount savings = new SavingsAccount("SA123", 5000, 5);
         savings.accountType();
         savings.showDetails();
-        ((SavingsAccount) savings).addInterest();
+        savings.addInterest(); // ইন্টারেস্ট যোগ করা হচ্ছে
 
         System.out.println();
 
+        // 🔹 কারেন্ট একাউন্ট তৈরি
+        CurrentAccount current = new CurrentAccount("CA456", 3000, 1000);
         current.accountType();
         current.showDetails();
-        current.withdraw(3500); // ওভারড্রাফট পর্যন্ত উঠানো যাবে
+        current.withdraw(3500); // ওভারড্রাফট ব্যবহার করে টাকা তোলা হচ্ছে
 
         System.out.println();
 
-        // Interface ব্যবহার
-        Maintainable emp = new BankEmployee("রহিম");
+        // 🔹 ডিফল্ট সেভিংস একাউন্ট তৈরি (শুধু দেখানোর জন্য)
+        SavingsAccount defaultSaving = new SavingsAccount();
+        defaultSaving.accountType();
+        defaultSaving.showDetails();
+
+        System.out.println();
+
+        // 🔹 ব্যাংক কর্মী অডিট রিপোর্ট তৈরি করছে
+        BankEmployee emp = new BankEmployee("রহিম");
         emp.auditReport();
+
+        // 🔹 ডিফল্ট কর্মী
+        BankEmployee emp2 = new BankEmployee();
+        emp2.auditReport();
     }
 }
